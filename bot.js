@@ -1,6 +1,7 @@
-require('dotenv').config()
-const tmi = require('tmi.js')
-const fs = require('fs')
+import { Client } from 'tmi.js'
+import 'dotenv/config'
+import { readFileSync } from 'fs'
+import { createMessage } from './utils';
 
 const opts = {
     options: { debug: true },
@@ -16,12 +17,14 @@ const opts = {
 let data = {}
 
 try {
-    data = JSON.parse(fs.readFileSync('data.json'))
+    data = JSON.parse(readFileSync('data.json'))
 } catch (error) {
-    console.error(`file ${error.paht} does not exist`)
+    console.error(`file ${error.path} does not exist`)
 }
 
-const client = new tmi.client(opts)
+console.log(data)
+
+const client = Client(opts)
 
 client.on('connected', onConnectedHandler)
 client.on('message', onMessageHandler)
@@ -33,12 +36,16 @@ function onConnectedHandler(addr, port) {
 }
 
 function onMessageHandler(channel, tags, message, self) {
-    if(self) return
+    const messageString = createMessage(channel, tags, message, self)
 
-    if(message.toLowerCase() === '!death' && tags.subscriber) {
-        if(!data.deaths) data.deaths = 0
-        data.deaths++
-        fs.writeFileSync('data.json', JSON.stringify(data))
-        client.say(channel, `Brady has died ${data.deaths} times, what a loser LUL`)
+    if(messageString === '') {
+        return
+    } else {
+        try{
+            client.say(channel, messageString)
+        } catch(e) {
+            console.error(e)
+        }
     }
+    
 }
