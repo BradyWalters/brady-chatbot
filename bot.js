@@ -1,7 +1,7 @@
 import { Client } from 'tmi.js'
 import 'dotenv/config'
 import { readFileSync } from 'fs'
-import { createMessage } from './utils';
+import { createMessage } from './utils.mjs'
 
 const opts = {
     options: { debug: true },
@@ -22,8 +22,6 @@ try {
     console.error(`file ${error.path} does not exist`)
 }
 
-console.log(data)
-
 const client = Client(opts)
 
 client.on('connected', onConnectedHandler)
@@ -36,11 +34,14 @@ function onConnectedHandler(addr, port) {
 }
 
 function onMessageHandler(channel, tags, message, self) {
-    const messageString = createMessage(channel, tags, message, self)
-
-    if(messageString === '') {
+    const messageString = createMessage(channel, tags, message, self, data)
+    
+    if(!messageString) {
         return
+    } else if(messageString === '~delete') {
+        client.deletemessage(channel, tags.id)
     } else {
+        console.log(tags)
         try{
             client.say(channel, messageString)
         } catch(e) {
