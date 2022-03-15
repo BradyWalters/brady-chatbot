@@ -1,6 +1,10 @@
 import { createMessage } from "./utils.mjs";
 import { readFileSync } from 'fs'
 
+/**
+ * TODO: Look into Twitch CLI for testing!
+ */
+
 let data = {}
 
 try {
