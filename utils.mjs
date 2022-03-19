@@ -19,3 +19,7 @@ export function createMessage(channel, tags, message, self, data) {
         return
     }
 }
+
+export function subMessage(channel, username, method, message, userstate) {
+    return `Thank you ${username} for subscribing!`
+}
